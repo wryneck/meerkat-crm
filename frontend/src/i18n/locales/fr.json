@@ -147,7 +147,8 @@
         "description": "Sélectionnez un fichier CSV ou VCF contenant vos contacts. Un fichier CSV doit avoir des en-têtes dans la première ligne.",
         "dragDrop": "Glissez-déposez un fichier CSV ici, ou cliquez pour le sélectionner",
         "maxSize": "Taille maximale du fichier : 5 Mo",
-        "uploading": "Téléchargement en cours..."
+        "uploading": "Téléchargement en cours...",
+        "supportedFormats": "Formats pris en charge : CSV (tableur), VCF (vCard)"
       },
       "mapping": {
         "title": "Mapper les colonnes",

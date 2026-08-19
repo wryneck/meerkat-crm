@@ -147,7 +147,8 @@
         "description": "Seleziona un file CSV o VCF contenente i tuoi contatti. Un file CSV dovrebbe avere le intestazioni nella prima riga.",
         "dragDrop": "Trascina qui un file CSV o clicca per selezionare",
         "maxSize": "Dimensione massima file: 5MB",
-        "uploading": "Caricamento in corso..."
+        "uploading": "Caricamento in corso...",
+        "supportedFormats": "Formati supportati: CSV (foglio di calcolo), VCF (vCard)"
       },
       "mapping": {
         "title": "Mappa Colonne",

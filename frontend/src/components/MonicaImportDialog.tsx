@@ -546,9 +546,9 @@ export default function MonicaImportDialog({
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell>{t('contacts.add.firstname', 'First Name')}</TableCell>
-                <TableCell>{t('contacts.add.lastname', 'Last Name')}</TableCell>
-                <TableCell>{t('contacts.add.email', 'Email')}</TableCell>
+                <TableCell>{t('contacts.firstname', 'First Name')}</TableCell>
+                <TableCell>{t('contacts.lastname', 'Last Name')}</TableCell>
+                <TableCell>{t('contacts.email', 'Email')}</TableCell>
                 <TableCell>{t('settings.monicaImport.review.related', 'Related data')}</TableCell>
                 <TableCell width={110}>{t('contacts.import.preview.status', 'Status')}</TableCell>
                 <TableCell width={150}>{t('contacts.import.preview.action', 'Action')}</TableCell>

@@ -147,7 +147,8 @@
         "description": "Selecciona un archivo CSV o VCF con tus contactos. Un archivo CSV debe tener encabezados en la primera fila.",
         "dragDrop": "Arrastra y suelta un archivo CSV aquí, o haz clic para seleccionar",
         "maxSize": "Tamaño máximo del archivo: 5MB",
-        "uploading": "Subiendo..."
+        "uploading": "Subiendo...",
+        "supportedFormats": "Formatos admitidos: CSV (hoja de cálculo), VCF (vCard)"
       },
       "mapping": {
         "title": "Mapear Columnas",

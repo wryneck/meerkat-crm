@@ -481,9 +481,9 @@ export default function ImportContactsDialog({
             <TableHead>
               <TableRow>
                 <TableCell width={50}>{t('contacts.import.preview.row', 'Row')}</TableCell>
-                <TableCell>{t('contacts.add.firstname', 'First Name')}</TableCell>
-                <TableCell>{t('contacts.add.lastname', 'Last Name')}</TableCell>
-                <TableCell>{t('contacts.add.email', 'Email')}</TableCell>
+                <TableCell>{t('contacts.firstname', 'First Name')}</TableCell>
+                <TableCell>{t('contacts.lastname', 'Last Name')}</TableCell>
+                <TableCell>{t('contacts.email', 'Email')}</TableCell>
                 <TableCell width={120}>{t('contacts.import.preview.status', 'Status')}</TableCell>
                 <TableCell width={160}>{t('contacts.import.preview.action', 'Action')}</TableCell>
               </TableRow>

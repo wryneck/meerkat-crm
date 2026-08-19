@@ -147,7 +147,8 @@
         "description": "Select a CSV or VCF file containing your contacts. A CSV file should have headers in the first row.",
         "dragDrop": "Drag and drop a CSV file here, or click to select",
         "maxSize": "Maximum file size: 5MB",
-        "uploading": "Uploading..."
+        "uploading": "Uploading...",
+        "supportedFormats": "Supported formats: CSV (spreadsheet), VCF (vCard)"
       },
       "mapping": {
         "title": "Map Columns",
