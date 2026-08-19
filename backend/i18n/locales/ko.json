@@ -1,0 +1,40 @@
+{
+  "email": {
+    "footer": "Meerkat CRM - 개인 연락처 관리",
+    "reminder": {
+      "subject": "오늘의 리마인더",
+      "remindersTitle": "오늘의 리마인더",
+      "birthdaysTitle": "다가오는 생일",
+      "today": "오늘!",
+      "tomorrow": "내일",
+      "inDays": "{{days}}일 후",
+      "unknownContact": "알 수 없음",
+      "contactLabel": "연락처"
+    },
+    "passwordReset": {
+      "subject": "Meerkat CRM 비밀번호 재설정",
+      "intro": "Meerkat CRM 비밀번호 재설정 요청을 받았습니다.",
+      "instruction": "이 토큰을 사용하여 60분 이내에 재설정을 완료하세요:",
+      "ignore": "재설정을 요청하지 않으셨다면 이 이메일을 무시하셔도 됩니다."
+    }
+  },
+  "calendar": {
+    "untitledEvent": "제목 없는 캘린더 일정"
+  },
+  "monicaImport": {
+    "untitledActivity": "활동",
+    "gift": {
+      "idea": "아이디어",
+      "offered": "선물함",
+      "received": "받음"
+    },
+    "note": {
+      "call": "{{date}} 통화(Monica에서 가져옴):\n{{content}}",
+      "task": "할 일(Monica에서 가져옴): {{title}}",
+      "taskCompleted": "완료된 작업(Monica에서 가져옴): {{title}}",
+      "gift": "선물({{status}}, Monica에서 가져옴): {{name}}",
+      "debtYouOwe": "빚(Monica에서 가져옴): 내가 {{amount}} 빚짐",
+      "debtTheyOwe": "빚(Monica에서 가져옴): {{amount}}를 빚짐"
+    }
+  }
+}

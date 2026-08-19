@@ -1,0 +1,40 @@
+{
+  "email": {
+    "footer": "Meerkat CRM - 個人の連絡先管理",
+    "reminder": {
+      "subject": "あなたの毎日のリマインダー",
+      "remindersTitle": "今日のリマインダー",
+      "birthdaysTitle": "今後の誕生日",
+      "today": "今日！",
+      "tomorrow": "明日",
+      "inDays": "{{days}} 日後",
+      "unknownContact": "不明",
+      "contactLabel": "連絡先"
+    },
+    "passwordReset": {
+      "subject": "Meerkat CRM のパスワードをリセット",
+      "intro": "Meerkat CRM のパスワードリセットをリクエストいただきました。",
+      "instruction": "このトークンを使って60分以内にリセットを完了してください：",
+      "ignore": "リセットを要求していない場合は、このメールを無視してください。"
+    }
+  },
+  "calendar": {
+    "untitledEvent": "名称未設定のカレンダー予定"
+  },
+  "monicaImport": {
+    "untitledActivity": "アクティビティ",
+    "gift": {
+      "idea": "アイデア",
+      "offered": "プレゼント済み",
+      "received": "受け取った"
+    },
+    "note": {
+      "call": "{{date}} の通話（Monica からインポート）：\n{{content}}",
+      "task": "未完了のタスク（Monica からインポート）：{{title}}",
+      "taskCompleted": "完了済みタスク（Monica からインポート）：{{title}}",
+      "gift": "贈り物（{{status}}、Monica からインポート）：{{name}}",
+      "debtYouOwe": "借金（Monica からインポート）：{{amount}} の貸し",
+      "debtTheyOwe": "借金（Monica からインポート）：{{amount}} の借り"
+    }
+  }
+}

@@ -6,6 +6,9 @@ import deTranslations from './locales/de.json';
 import itTranslations from './locales/it.json';
 import esTranslations from './locales/es.json';
 import frTranslations from './locales/fr.json';
+import zhTranslations from './locales/zh.json';
+import jaTranslations from './locales/ja.json';
+import koTranslations from './locales/ko.json';
 
 // Suppress i18next's promotional console message (hardcoded since v23)
 const noop = () => {};
@@ -30,6 +33,15 @@ i18n
       },
       fr: {
         translation: frTranslations
+      },
+      zh: {
+        translation: zhTranslations
+      },
+      ja: {
+        translation: jaTranslations
+      },
+      ko: {
+        translation: koTranslations
       }
     },
     fallbackLng: 'en',
