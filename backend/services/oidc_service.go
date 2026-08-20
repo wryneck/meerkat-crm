@@ -222,6 +222,7 @@ func FindOrProvisionUser(db *gorm.DB, claims *OIDCClaims, cfg *config.Config) (*
 		Username:     username,
 		Password:     "", // OIDC-only accounts have no password
 		Email:        email,
+		Language:     "", // No environment inference; defaults to detection until user picks one
 		OIDCSubject:  &claims.Subject,
 		OIDCProvider: &claims.Provider,
 	}

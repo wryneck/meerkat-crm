@@ -404,11 +404,14 @@
     "dateFormat": {
       "title": "日付形式",
       "label": "日付形式",
-      "description": "アプリ全体での日付の表示方式を選択してください。",
+      "description": "アプリ全体での日付表示を選択します。自動を選ぶと言語に従います。",
       "options": {
         "eu": "欧州形式（DD.MM.YYYY）",
         "us": "米国形式（MM/DD/YYYY）",
-        "iso": "ISO 形式（YYYY-MM-DD）"
+        "iso": "ISO 形式（YYYY-MM-DD）",
+        "cjk": "中日形式（YYYY年M月D日）",
+        "ko": "韓国形式（YYYY.MM.DD）",
+        "auto": "自動（言語に従う）"
       }
     },
     "theme": {

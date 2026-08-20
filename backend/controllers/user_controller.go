@@ -54,6 +54,11 @@ func RegisterUser(cfg *config.Config) gin.HandlerFunc {
 		var userCount int64
 		db.Model(&models.User{}).Count(&userCount)
 
+		// Language is intentionally left empty on registration. The user's
+		// effective display language then falls back to environment detection
+		// (browser navigator) until they explicitly pick one in Settings, which
+		// is the only path that writes users.language. The backend never infers
+		// the language from the environment.
 		user := models.User{
 			Username: strings.ToLower(input.Username),
 			Email:    strings.ToLower(input.Email),
@@ -369,9 +374,10 @@ type UpdateLanguageInput struct {
 	Language string `json:"language" validate:"required,oneof=en de it es fr zh ja ko"`
 }
 
-// UpdateDateFormatInput represents the request body for updating user date format
+// UpdateDateFormatInput represents the request body for updating user date format.
+// An empty value clears the explicit preference so the format follows the language.
 type UpdateDateFormatInput struct {
-	DateFormat string `json:"date_format" validate:"required,oneof=eu us iso"`
+	DateFormat string `json:"date_format" validate:"omitempty,oneof=eu us iso cjk ko"`
 }
 
 // UpdateLanguage updates the authenticated user's language preference
@@ -436,9 +442,12 @@ func UpdateDateFormat(context *gin.Context) {
 		return
 	}
 
-	// Validate date format is supported
-	if input.DateFormat != "eu" && input.DateFormat != "us" && input.DateFormat != "iso" {
-		apperrors.AbortWithError(context, apperrors.ErrInvalidInput("date_format", "Unsupported date format. Supported: eu, us, iso"))
+	// Validate date format is supported (empty is allowed: it clears the
+	// preference so the format follows the active language).
+	if input.DateFormat != "" &&
+		input.DateFormat != "eu" && input.DateFormat != "us" &&
+		input.DateFormat != "iso" && input.DateFormat != "cjk" && input.DateFormat != "ko" {
+		apperrors.AbortWithError(context, apperrors.ErrInvalidInput("date_format", "Unsupported date format. Supported: eu, us, iso, cjk, ko"))
 		return
 	}
 

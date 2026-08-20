@@ -13,7 +13,7 @@ export async function updateLanguage(language: string): Promise<string> {
   return data?.message || 'Language updated successfully.';
 }
 
-export async function updateDateFormat(dateFormat: string): Promise<string> {
+export async function updateDateFormat(dateFormat: string | null): Promise<string> {
   const response = await apiFetch(`${API_BASE_URL}/users/date-format`, {
     method: 'PATCH',
     headers: getAuthHeaders(),

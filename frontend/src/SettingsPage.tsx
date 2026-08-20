@@ -31,7 +31,7 @@ import { DateFormat, useDateFormat } from './DateFormatProvider';
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const { preference: themePreference, setPreference: setThemePreference } = useThemePreference();
-  const { dateFormat, setDateFormat } = useDateFormat();
+  const { dateFormatExplicit, dateFormat, setDateFormat } = useDateFormat();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -43,7 +43,7 @@ export default function SettingsPage() {
     const newLang = event.target.value;
     // Update frontend i18n immediately for responsive UI
     i18n.changeLanguage(newLang);
-    
+
     // Sync to backend for email language preferences (fire and forget)
     try {
       await updateLanguage(newLang);
@@ -59,11 +59,14 @@ export default function SettingsPage() {
   };
 
   const handleDateFormatChange = async (event: SelectChangeEvent<DateFormat>) => {
-    const newFormat = event.target.value as DateFormat;
+    const rawValue = event.target.value as string;
+    // Empty value means "follow the language" (clear the explicit choice).
+    const newFormat: DateFormat | null = rawValue === '' ? null : (rawValue as DateFormat);
     // Update frontend immediately for responsive UI
     setDateFormat(newFormat);
 
-    // Sync to backend for email date format preferences (fire and forget)
+    // Sync to backend for email date format preferences (fire and forget).
+    // A null value clears the stored preference so it follows the language.
     try {
       await updateDateFormat(newFormat);
     } catch (error) {
@@ -160,7 +163,7 @@ export default function SettingsPage() {
             </InputLabel>
             <Select
               labelId="language-select-label"
-              value={i18n.language}
+              value={i18n.resolvedLanguage ?? i18n.language ?? 'en'}
               label={t('settings.language.label')}
               onChange={handleLanguageChange}
             >
@@ -197,13 +200,16 @@ export default function SettingsPage() {
             </InputLabel>
             <Select
               labelId="date-format-select-label"
-              value={dateFormat}
+              value={dateFormatExplicit ?? dateFormat}
               label={t('settings.dateFormat.label')}
               onChange={handleDateFormatChange}
             >
+              <MenuItem value="">{t('settings.dateFormat.options.auto')}</MenuItem>
               <MenuItem value="eu" >{t('settings.dateFormat.options.eu' )}</MenuItem>
               <MenuItem value="us" >{t('settings.dateFormat.options.us' )}</MenuItem>
               <MenuItem value="iso">{t('settings.dateFormat.options.iso')}</MenuItem>
+              <MenuItem value="cjk">{t('settings.dateFormat.options.cjk')}</MenuItem>
+              <MenuItem value="ko" >{t('settings.dateFormat.options.ko' )}</MenuItem>
             </Select>
           </FormControl>
 

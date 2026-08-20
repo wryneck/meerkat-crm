@@ -51,8 +51,12 @@ i18n
       escapeValue: false
     },
     detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
+      // Environment-only detection: pick up the browser/OS language on every
+      // load. The explicit user choice is stored server-side (users.language)
+      // and applied after login / on app load; we intentionally do NOT cache a
+      // client-side language, so a previously stored choice can never clobber
+      // detection. When users.language is empty, detection wins.
+      order: ['navigator']
     }
   }).then(() => {
     console.log = origLog;

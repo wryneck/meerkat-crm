@@ -305,6 +305,10 @@ func formatDateForUser(t time.Time, dateFormat string) string {
 		return t.Format("01/02/2006") // MM/DD/YYYY
 	case "iso":
 		return t.Format("2006-01-02") // YYYY-MM-DD
+	case "ko":
+		return t.Format("2006.01.02") // YYYY.MM.DD
+	case "cjk":
+		return t.Format("2006年1月2日") // YYYY年M月D日
 	default:
 		return t.Format("02.01.2006") // DD.MM.YYYY (EU default)
 	}
@@ -326,6 +330,12 @@ func formatBirthdayForUser(birthday string, dateFormat string) string {
 				return month + "/" + day
 			case "iso":
 				return month + "-" + day
+			case "ko":
+				return month + "." + day
+			case "cjk":
+				mm, _ := strconv.Atoi(month)
+				dd, _ := strconv.Atoi(day)
+				return strconv.Itoa(mm) + "月" + strconv.Itoa(dd) + "日"
 			default:
 				return day + "." + month + "."
 			}
@@ -344,6 +354,13 @@ func formatBirthdayForUser(birthday string, dateFormat string) string {
 			return month + "/" + day + "/" + year
 		case "iso":
 			return year + "-" + month + "-" + day
+		case "ko":
+			return year + "." + month + "." + day
+		case "cjk":
+			y, _ := strconv.Atoi(year)
+			mm, _ := strconv.Atoi(month)
+			dd, _ := strconv.Atoi(day)
+			return strconv.Itoa(y) + "年" + strconv.Itoa(mm) + "月" + strconv.Itoa(dd) + "日"
 		default:
 			return day + "." + month + "." + year
 		}
@@ -365,10 +382,11 @@ func sendReminderEmail(user models.User, reminders []models.Reminder, config con
 		lang = i18n.DefaultLanguage
 	}
 
-	// Get user's date format preference (default to "eu" if not set)
+	// Get user's date format preference. When not set, derive it from the
+	// user's language so email reminders follow the same convention as the UI.
 	dateFormat := user.DateFormat
 	if dateFormat == "" {
-		dateFormat = "eu"
+		dateFormat = i18n.DefaultDateFormatForLanguage(user.Language)
 	}
 
 	// Build reminder items

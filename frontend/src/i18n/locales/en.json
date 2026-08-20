@@ -404,11 +404,14 @@
     "dateFormat": {
       "title": "Date Format",
       "label": "Date Format",
-      "description": "Choose how dates are displayed throughout the application.",
+      "description": "Choose how dates are displayed throughout the application. Leave it on Auto to follow your language.",
       "options": {
         "eu": "European (DD.MM.YYYY)",
         "us": "US (MM/DD/YYYY)",
-        "iso": "ISO (YYYY-MM-DD)"
+        "iso": "ISO (YYYY-MM-DD)",
+        "cjk": "Chinese/Japanese (YYYY年M月D日)",
+        "ko": "Korean (YYYY.MM.DD)",
+        "auto": "Auto (follow language)"
       }
     },
     "theme": {

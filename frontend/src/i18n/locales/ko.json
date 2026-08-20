@@ -404,11 +404,14 @@
     "dateFormat": {
       "title": "날짜 형식",
       "label": "날짜 형식",
-      "description": "앱 전체의 날짜 표시 방식을 선택하세요.",
+      "description": "앱 전체의 날짜 표시 방식을 선택합니다. 자동을 두면 언어를 따릅니다.",
       "options": {
         "eu": "유럽 형식(DD.MM.YYYY)",
         "us": "미국 형식(MM/DD/YYYY)",
-        "iso": "ISO 형식(YYYY-MM-DD)"
+        "iso": "ISO 형식(YYYY-MM-DD)",
+        "cjk": "중일 형식 (YYYY년M월D일)",
+        "ko": "한국 형식 (YYYY.MM.DD)",
+        "auto": "자동 (언어 따르기)"
       }
     },
     "theme": {

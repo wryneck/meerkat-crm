@@ -144,3 +144,27 @@ func IsValidLanguage(lang string) bool {
 	}
 	return false
 }
+
+// defaultDateFormatForLanguage maps each supported UI language to the most
+// common display date format for that language. Used when a user has not made
+// an explicit date-format choice: the format then follows the selected language.
+var defaultDateFormatForLanguage = map[string]string{
+	"en": "us", // MM/DD/YYYY
+	"de": "eu", // DD.MM.YYYY
+	"it": "eu", // DD/MM/YYYY
+	"es": "eu", // DD/MM/YYYY
+	"fr": "eu", // DD/MM/YYYY
+	"zh": "cjk", // YYYY年M月D日
+	"ja": "cjk", // YYYY年M月D日
+	"ko": "ko", // YYYY.MM.DD
+}
+
+// DefaultDateFormatForLanguage returns the date format that should be used when
+// the user has not explicitly chosen one. Falls back to ISO for unknown languages.
+func DefaultDateFormatForLanguage(lang string) string {
+	normalized := normalizeLanguage(lang)
+	if df, ok := defaultDateFormatForLanguage[normalized]; ok {
+		return df
+	}
+	return "iso"
+}

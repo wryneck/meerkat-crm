@@ -190,3 +190,52 @@ describe('autoFormatBirthdayInputWithFormat', () => {
     expect(autoFormatBirthdayInputWithFormat('1990-', '1990-0', 'iso')).toBe('1990');
   });
 });
+
+describe('cjk and ko formats', () => {
+  test('formats full and year-less dates in CJK style', () => {
+    expect(formatDateWithFormat('2026-08-20', 'cjk')).toBe('2026年8月20日');
+    expect(formatBirthdayWithFormat('1990-04-30', 'cjk')).toBe('1990年4月30日');
+    expect(formatBirthdayWithFormat('--04-30', 'cjk')).toBe('4月30日');
+    expect(formatBirthdayForInputWithFormat('1990-04-30', 'cjk')).toBe('1990年4月30日');
+    expect(formatBirthdayForInputWithFormat('--04-30', 'cjk')).toBe('4月30日');
+  });
+
+  test('formats full and year-less dates in Korean style', () => {
+    expect(formatDateWithFormat('2026-08-20', 'ko')).toBe('2026.08.20');
+    expect(formatBirthdayWithFormat('1990-04-30', 'ko')).toBe('1990.04.30');
+    expect(formatBirthdayWithFormat('--04-30', 'ko')).toBe('04.30');
+    expect(formatBirthdayForInputWithFormat('1990-04-30', 'ko')).toBe('1990.04.30');
+    expect(formatBirthdayForInputWithFormat('--04-30', 'ko')).toBe('04.30');
+  });
+
+  test('parses CJK input back to ISO', () => {
+    expect(parseBirthdayInputWithFormat('2026年8月20日', 'cjk')).toBe('2026-08-20');
+    expect(parseBirthdayInputWithFormat('8月20日', 'cjk')).toBe('--08-20');
+    // ISO is always accepted regardless of format
+    expect(parseBirthdayInputWithFormat('1990-04-30', 'cjk')).toBe('1990-04-30');
+  });
+
+  test('parses Korean input back to ISO', () => {
+    expect(parseBirthdayInputWithFormat('2026.08.20', 'ko')).toBe('2026-08-20');
+    expect(parseBirthdayInputWithFormat('08.20', 'ko')).toBe('--08-20');
+  });
+
+  test('rejects out-of-range CJK/Korean input', () => {
+    expect(parseBirthdayInputWithFormat('2026年13月40日', 'cjk')).toBeNull();
+    expect(parseBirthdayInputWithFormat('13.40.2026', 'ko')).toBeNull();
+  });
+
+  test('auto-formats CJK input while typing', () => {
+    expect(autoFormatBirthdayInputWithFormat('2026', '', 'cjk')).toBe('2026');
+    expect(autoFormatBirthdayInputWithFormat('20268', '2026', 'cjk')).toBe('2026年8');
+    expect(autoFormatBirthdayInputWithFormat('202688', '20268', 'cjk')).toBe('2026年8月8日');
+    expect(autoFormatBirthdayInputWithFormat('20261015', '2026101', 'cjk')).toBe('2026年10月15日');
+  });
+
+  test('auto-formats Korean input while typing', () => {
+    expect(autoFormatBirthdayInputWithFormat('2026', '', 'ko')).toBe('2026');
+    expect(autoFormatBirthdayInputWithFormat('202608', '2026', 'ko')).toBe('2026.08');
+    expect(autoFormatBirthdayInputWithFormat('20260820', '202608', 'ko')).toBe('2026.08.20');
+  });
+});
+

@@ -404,11 +404,14 @@
     "dateFormat": {
       "title": "Datumsformat",
       "label": "Datumsformat",
-      "description": "Wählen Sie, wie Daten in der Anwendung angezeigt werden.",
+      "description": "Wählen Sie, wie Daten in der gesamten Anwendung angezeigt werden. Automatisch folgt der Sprache.",
       "options": {
         "eu": "Europäisch (TT.MM.JJJJ)",
         "us": "US (MM/TT/JJJJ)",
-        "iso": "ISO (JJJJ-MM-TT)"
+        "iso": "ISO (JJJJ-MM-TT)",
+        "cjk": "Chinesisch/Japanisch (YYYY年M月D日)",
+        "ko": "Koreanisch (YYYY.MM.DD)",
+        "auto": "Automatisch (Sprache folgen)"
       }
     },
     "theme": {

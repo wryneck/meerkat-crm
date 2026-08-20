@@ -452,13 +452,14 @@ function App() {
   const [token, setToken] = useState(getToken());
 
   useEffect(() => {
-    // Restore session after OIDC redirect: the server sets the auth cookie but
-    // localStorage is empty, so we fetch user info once to populate it.
-    if (!getToken()) {
-      fetchAndCacheUserInfo().then(info => {
-        if (info) setToken(getToken());
-      });
-    }
+    // On every load (cold start, refresh, or post-OIDC redirect) fetch the
+    // current user. Besides restoring the session when the auth cookie exists,
+    // this applies the user's explicit language preference from the backend
+    // (fetchAndCacheUserInfo does that), so the choice survives a refresh. When
+    // not authenticated this simply returns null.
+    fetchAndCacheUserInfo().then(info => {
+      if (info) setToken(getToken());
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

@@ -3,6 +3,9 @@
 // Token is stored in httpOnly cookie (not accessible from JS for security)
 // User info is cached in localStorage for UI purposes
 
+import i18n from './i18n/config';
+import { initializeDateFormatFromBackend } from './DateFormatProvider';
+
 const API_SERVER_URL = process.env.REACT_APP_API_URL || '';
 export const API_BASE_URL = `${API_SERVER_URL}/api/v1`;
 
@@ -58,6 +61,29 @@ export async function fetchAndCacheUserInfo(): Promise<UserInfo | null> {
       is_admin: data.is_admin || false,
     };
     localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
+
+    // Apply the user's explicit language preference (stored server-side) if set.
+    // When users.language is empty we leave the environment detection (navigator)
+    // in place. This single spot turns the backend value into the active UI
+    // language, covering login, page refresh, and OIDC restore.
+    const backendLang = data.language;
+    const applyLang = () => {
+      if (backendLang && i18n.hasResourceBundle(backendLang, 'translation')) {
+        i18n.changeLanguage(backendLang);
+      }
+    };
+    if (i18n.isInitialized) {
+      applyLang();
+    } else {
+      i18n.on('initialized', applyLang);
+    }
+
+    // Apply the user's explicit date-format preference (stored server-side) if
+    // set. When empty we leave the language-derived default in place. This
+    // single spot turns the backend value into the active UI date format,
+    // covering login, page refresh, and OIDC restore.
+    initializeDateFormatFromBackend(data.date_format);
+
     return userInfo;
   } catch {
     return null;

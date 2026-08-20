@@ -404,11 +404,14 @@
     "dateFormat": {
       "title": "Formato de Fecha",
       "label": "Formato de Fecha",
-      "description": "Elige cómo se muestran las fechas en toda la aplicación.",
+      "description": "Elige cómo se muestran las fechas en la aplicación. Automático sigue el idioma.",
       "options": {
         "eu": "Europeo (DD.MM.AAAA)",
         "us": "EE.UU. (MM/DD/AAAA)",
-        "iso": "ISO (AAAA-MM-DD)"
+        "iso": "ISO (AAAA-MM-DD)",
+        "cjk": "Chino/Japonés (YYYY年M月D日)",
+        "ko": "Coreano (YYYY.MM.DD)",
+        "auto": "Automático (seguir idioma)"
       }
     },
     "theme": {
