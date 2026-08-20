@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 // ErrorResponse represents the JSON structure returned to clients
@@ -85,11 +86,21 @@ func RespondWithError(c *gin.Context, err *AppError) {
 	c.Abort()
 }
 
-// LogError logs an error with context
+// LogError logs an error with context.
+// 5xx errors are logged at ERROR level (server-side faults); 4xx errors are
+// logged at WARN level because they usually represent expected client states
+// (e.g. 404 for "not configured" resources) rather than server faults.
 func LogError(c *gin.Context, err *AppError) {
 	log := logger.FromContext(c)
 
-	event := log.Error().
+	var event *zerolog.Event
+	if err.HTTPStatus >= 500 {
+		event = log.Error()
+	} else {
+		event = log.Warn()
+	}
+
+	event = event.
 		Str("code", err.Code).
 		Int("status", err.HTTPStatus).
 		Str("error", err.Message)
