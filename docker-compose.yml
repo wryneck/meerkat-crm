@@ -21,7 +21,6 @@ services:
       - PUID=${PUID:-1001}
       - PGID=${PGID:-1001}
     volumes:
-      - ${DATA_PATH:-./data}:/app/data
       - ${PHOTOS_PATH:-./photos}:/app/static/photos
     ports:
       - "${FRONTEND_PORT:-7300}:8080"

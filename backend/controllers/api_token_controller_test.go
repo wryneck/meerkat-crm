@@ -73,7 +73,12 @@ func TestListApiTokens_OrderedByCreatedAtDesc(t *testing.T) {
 	var user models.User
 	db.First(&user)
 
-	db.Create(&models.ApiToken{UserID: user.ID, Name: "first", TokenHash: "hash-first"})
+	// Set explicit distinct CreatedAt values so the DESC order is deterministic
+	// regardless of how fast the two rows are inserted (same-millisecond inserts
+	// would otherwise tie and produce a flaky ordering).
+	first := &models.ApiToken{UserID: user.ID, Name: "first", TokenHash: "hash-first"}
+	db.Create(first)
+	db.Model(first).Update("created_at", time.Now().Add(-2*time.Hour))
 	db.Create(&models.ApiToken{UserID: user.ID, Name: "second", TokenHash: "hash-second"})
 
 	router.GET("/api-tokens", ListApiTokens)

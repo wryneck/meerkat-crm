@@ -1,7 +1,7 @@
 .PHONY: migrate-up migrate-down migrate-create migrate-status migrate-force migrate-version help
 
-# Database path
-DB_PATH ?= meerkat.db
+# MySQL connection is configured via environment variables (DB_HOST, DB_PORT,
+# DB_USER, DB_PASSWORD, DB_NAME) — see config.LoadConfig for defaults.
 MIGRATIONS_DIR = ./database/migrations
 
 help: ## Show this help message
@@ -11,12 +11,12 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 
 migrate-up: ## Run all pending migrations
-	@echo "Running migrations on $(DB_PATH)..."
+	@echo "Running migrations (MySQL)..."
 	@go run cmd/migrate/main.go up
 	@echo "Migrations applied successfully!"
 
 migrate-down: ## Rollback the last migration
-	@echo "Rolling back last migration on $(DB_PATH)..."
+	@echo "Rolling back last migration..."
 	@go run cmd/migrate/main.go down
 	@echo "Migration rolled back successfully!"
 
@@ -29,7 +29,7 @@ migrate-create: ## Create a new migration file (usage: make migrate-create NAME=
 	@echo "Migration files created in $(MIGRATIONS_DIR)!"
 
 migrate-status: ## Show current migration version
-	@echo "Current migration status for $(DB_PATH):"
+	@echo "Current migration status:"
 	@go run cmd/migrate/main.go version
 
 migrate-force: ## Force set migration version (usage: make migrate-force VERSION=1)
@@ -37,8 +37,8 @@ migrate-force: ## Force set migration version (usage: make migrate-force VERSION
 		echo "Error: VERSION is required. Usage: make migrate-force VERSION=1"; \
 		exit 1; \
 	fi
-	@echo "Forcing migration version to $(VERSION) on $(DB_PATH)..."
-	@migrate -path $(MIGRATIONS_DIR) -database "sqlite3://$(DB_PATH)" force $(VERSION)
+	@echo "Forcing migration version to $(VERSION)..."
+	@migrate -path $(MIGRATIONS_DIR) -database "mysql://$(DB_USER):$(DB_PASSWORD)@tcp($(DB_HOST):$(DB_PORT))/$(DB_NAME)" force $(VERSION)
 	@echo "Migration version forced to $(VERSION)!"
 
 migrate-version: ## Show available migration files

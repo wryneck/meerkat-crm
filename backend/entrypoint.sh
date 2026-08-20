@@ -16,10 +16,9 @@ if [ "$(id -u appuser)" != "$PUID" ]; then
     NEEDS_CHOWN=1
 fi
 
-DATA_DIR="$(dirname "$SQLITE_DB_PATH")"
-
-# In case of first startup directories will be owned by root
-if [ "$(stat -c '%u:%g' "$DATA_DIR")" != "$PUID:$PGID" ] || \
+# The database now lives in MySQL, so only the photo directory needs to be
+# writable by the app user.
+if [ -d "$PROFILE_PHOTO_DIR" ] && \
     [ "$(stat -c '%u:%g' "$PROFILE_PHOTO_DIR")" != "$PUID:$PGID" ];
 then
     NEEDS_CHOWN=1

@@ -2,9 +2,11 @@
 set -e
 
 # Remap the backend user to the host-provided PUID/PGID so files written to the
-# mounted volumes (/app/data, /app/static/photos) get sane ownership, then hand
-# off to supervisord (which keeps running as root and drops the backend process
-# to appuser via `user=appuser`).
+# mounted volume (/app/static/photos) get sane ownership, then hand off to
+# supervisord (which keeps running as root and drops the backend process to
+# appuser via `user=appuser`).
+#
+# The database lives in MySQL, so there is no SQLite file to chown anymore.
 
 PUID="${PUID:-1001}"
 PGID="${PGID:-1001}"
@@ -21,17 +23,15 @@ if [ "$(id -u appuser)" != "$PUID" ]; then
     NEEDS_CHOWN=1
 fi
 
-DATA_DIR="$(dirname "$SQLITE_DB_PATH")"
-
 # On first startup the mounted directories may be owned by root
-if [ "$(stat -c '%u:%g' "$DATA_DIR")" != "$PUID:$PGID" ] || \
+if [ -d "$PROFILE_PHOTO_DIR" ] && \
     [ "$(stat -c '%u:%g' "$PROFILE_PHOTO_DIR")" != "$PUID:$PGID" ];
 then
     NEEDS_CHOWN=1
 fi
 
 if [ "$NEEDS_CHOWN" = "1" ]; then
-    chown -R appuser:appgroup "$DATA_DIR" "$PROFILE_PHOTO_DIR"
+    chown -R appuser:appgroup "$PROFILE_PHOTO_DIR"
 fi
 
 exec "$@"

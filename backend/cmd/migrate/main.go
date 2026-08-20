@@ -6,9 +6,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/golang-migrate/migrate/v4"
-	migrateSQLite "github.com/golang-migrate/migrate/v4/database/sqlite"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/go-sql-driver/mysql"
+
+	"meerkat/config"
+	"meerkat/database"
 )
 
 func main() {
@@ -17,50 +18,40 @@ func main() {
 	}
 
 	command := os.Args[1]
-	dbPath := "meerkat.db"
-	migrationsPath := "file://database/migrations"
 
-	// Open database connection
-	db, err := sql.Open("sqlite", dbPath)
+	// Load database configuration from the environment (same defaults as the app).
+	cfg := config.LoadConfig()
+
+	// The target database must exist before migrations can run.
+	if err := database.EnsureDatabase(cfg); err != nil {
+		log.Fatalf("Failed to ensure database exists: %v", err)
+	}
+
+	dsn := database.BuildDSN(cfg, cfg.DBName, true)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
 	defer db.Close()
 
-	// Create migration driver
-	driver, err := migrateSQLite.WithInstance(db, &migrateSQLite.Config{})
-	if err != nil {
-		log.Fatalf("Failed to create migration driver: %v", err)
-	}
-
-	// Create migration instance
-	m, err := migrate.NewWithDatabaseInstance(
-		migrationsPath,
-		"sqlite",
-		driver,
-	)
-	if err != nil {
-		log.Fatalf("Failed to create migration instance: %v", err)
-	}
-
 	// Execute command
 	switch command {
 	case "up":
-		if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		if err := database.RunMigrations(db); err != nil {
 			log.Fatalf("Failed to run migrations: %v", err)
 		}
 		fmt.Println("Migrations applied successfully!")
 	case "down":
-		if err := m.Down(); err != nil && err != migrate.ErrNoChange {
+		if err := database.RollbackLast(db); err != nil {
 			log.Fatalf("Failed to rollback migrations: %v", err)
 		}
 		fmt.Println("Migrations rolled back successfully!")
 	case "version":
-		version, dirty, err := m.Version()
-		if err != nil && err != migrate.ErrNilVersion {
+		version, dirty, err := database.MigrationVersion(db)
+		if err != nil {
 			log.Fatalf("Failed to get migration version: %v", err)
 		}
-		if err == migrate.ErrNilVersion {
+		if version == 0 {
 			fmt.Println("No migrations applied yet")
 		} else {
 			fmt.Printf("Current version: %d (dirty: %v)\n", version, dirty)

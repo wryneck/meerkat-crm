@@ -24,8 +24,12 @@ type OIDCConfig struct {
 }
 
 type Config struct {
-	DBPath                   string
-	ReminderTime             string
+	DBHost                  string
+	DBPort                  string
+	DBUser                  string
+	DBPassword              string
+	DBName                  string
+	ReminderTime            string
 	ReminderTimezone         string
 	FrontendURL              string
 	Port                     string
@@ -75,7 +79,11 @@ func LoadConfig() *Config {
 	idleTimeout := getIntEnv("HTTP_IDLE_TIMEOUT", 60)
 
 	cfg := &Config{
-		DBPath:                  getEnv("SQLITE_DB_PATH", "meerkat.db"),
+		DBHost:                  getEnv("DB_HOST", "100.88.0.5"),
+		DBPort:                  getEnv("DB_PORT", "3306"),
+		DBUser:                  getEnv("DB_USER", "root"),
+		DBPassword:              getEnv("DB_PASSWORD", "123456"),
+		DBName:                  getEnv("DB_NAME", "meerkat"),
 		ReminderTime:            getEnv("REMINDER_TIME", "12:00"),
 		ReminderTimezone:        getEnv("REMINDER_TIMEZONE", "UTC"),
 		FrontendURL:             getEnv("FRONTEND_URL", "*"),
@@ -207,11 +215,29 @@ func (c *Config) Validate() []ValidationError {
 		})
 	}
 
-	// Validate Database Path
-	if c.DBPath == "" {
+	// Validate MySQL database configuration
+	if c.DBHost == "" {
 		errors = append(errors, ValidationError{
-			Field:   "SQLITE_DB_PATH",
-			Message: "Database path cannot be empty. Set SQLITE_DB_PATH environment variable.",
+			Field:   "DB_HOST",
+			Message: "Database host cannot be empty. Set DB_HOST environment variable.",
+		})
+	}
+	if c.DBPort == "" {
+		errors = append(errors, ValidationError{
+			Field:   "DB_PORT",
+			Message: "Database port cannot be empty. Set DB_PORT environment variable.",
+		})
+	}
+	if c.DBUser == "" {
+		errors = append(errors, ValidationError{
+			Field:   "DB_USER",
+			Message: "Database user cannot be empty. Set DB_USER environment variable.",
+		})
+	}
+	if c.DBName == "" {
+		errors = append(errors, ValidationError{
+			Field:   "DB_NAME",
+			Message: "Database name cannot be empty. Set DB_NAME environment variable.",
 		})
 	}
 

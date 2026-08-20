@@ -2,7 +2,7 @@
 #
 # Builds and runs the all-in-one image for end-to-end testing with Playwright.
 # This exercises the same artifact that ships to users (nginx + backend under
-# supervisord, same-origin /api). Uses a fresh database for each test run.
+# supervisord, same-origin /api). Uses a fresh MySQL database for each test run.
 #
 # USAGE:
 #   docker compose -f docker-compose.test.yml up -d --build --wait
@@ -10,20 +10,41 @@
 #   docker compose -f docker-compose.test.yml down -v
 
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: meerkat-test-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: test-root-password
+      MYSQL_DATABASE: meerkat_test
+    volumes:
+      - test-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
   meerkat:
     image: meerkat-crm-test:latest
     build:
       context: .
       dockerfile: Dockerfile
     container_name: meerkat-test
+    depends_on:
+      mysql:
+        condition: service_healthy
     environment:
-      - SQLITE_DB_PATH=/app/data/test.db
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=test-root-password
+      - DB_NAME=meerkat_test
       - JWT_SECRET_KEY=test-secret-key-for-e2e-testing-minimum-32-chars
       - PROFILE_PHOTO_DIR=/app/static/photos
       - FRONTEND_URL=http://localhost:7300
       - DISABLE_REGISTRATION=false
     volumes:
-      - test-data:/app/data
       - test-photos:/app/static/photos
     ports:
       # Frontend and same-origin /api are both served by nginx on 8080
@@ -36,5 +57,5 @@ services:
       start_period: 5s
 
 volumes:
-  test-data:
+  test-mysql-data:
   test-photos:

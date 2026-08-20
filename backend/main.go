@@ -52,7 +52,7 @@ func main() {
 	cfg.ValidateOrPanic()
 
 	logger.Info().Msg("Loading database and running migrations...")
-	db, err := database.InitDB(cfg.DBPath)
+	db, err := database.InitDB(cfg)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to initialize database")
 	}

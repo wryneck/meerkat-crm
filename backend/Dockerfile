@@ -31,9 +31,13 @@ RUN addgroup -g 1001 -S appgroup && adduser -u 1001 -S appuser -G appgroup
 RUN mkdir -p /app/static/photos /app/data && \
     chown -R appuser:appgroup /app
 
-# Set default environment
+# Set default environment (MySQL connection is usually overridden via compose/.env)
 ENV PORT=8080
-ENV SQLITE_DB_PATH=/app/data/meerkat.db
+ENV DB_HOST=127.0.0.1
+ENV DB_PORT=3306
+ENV DB_USER=root
+ENV DB_PASSWORD=123456
+ENV DB_NAME=meerkat
 ENV PROFILE_PHOTO_DIR=/app/static/photos
 
 # Copy the binary from builder

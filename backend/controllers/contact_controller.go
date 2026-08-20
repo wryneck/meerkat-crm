@@ -75,9 +75,36 @@ func CreateContact(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Contact created successfully", "contact": contact})
 }
 
+// isMySQL reports whether the underlying database is MySQL.
+// Used to pick dialect-specific SQL (JSON_TABLE vs SQLite's json_each, CONCAT
+// vs || concatenation). Unit tests run on in-memory SQLite, production on MySQL.
+func isMySQL(db *gorm.DB) bool {
+	return db.Dialector.Name() == "mysql"
+}
+
+// circleFilterSQL returns the dialect-specific EXISTS subquery that matches a
+// contact whose circles JSON array contains the given value.
+func circleFilterSQL(db *gorm.DB) string {
+	if isMySQL(db) {
+		return "EXISTS (SELECT 1 FROM JSON_TABLE(contacts.circles, '$[*]' COLUMNS (val VARCHAR(255) PATH '$')) AS jt WHERE jt.val = ?)"
+	}
+	return "EXISTS (SELECT 1 FROM json_each(contacts.circles) WHERE json_each.value = ?)"
+}
+
 // filters a contacts query by a free-text term
 func applyContactSearch(query *gorm.DB, searchTerm string) *gorm.DB {
 	like := "%" + searchTerm + "%"
+	if isMySQL(query) {
+		return query.Where(
+			"firstname LIKE ? OR lastname LIKE ? OR nickname LIKE ? "+
+				"OR CONCAT(firstname, ' ', lastname) LIKE ? OR CONCAT(nickname, ' ', lastname) LIKE ? "+
+				"OR email LIKE ? OR phone LIKE ? "+
+				"OR (json_valid(emails) AND EXISTS (SELECT 1 FROM JSON_TABLE(contacts.emails, '$[*]' COLUMNS (val VARCHAR(255) PATH '$.value')) AS jt WHERE jt.val LIKE ?)) "+
+				"OR (json_valid(phones) AND EXISTS (SELECT 1 FROM JSON_TABLE(contacts.phones, '$[*]' COLUMNS (val VARCHAR(255) PATH '$.value')) AS jt WHERE jt.val LIKE ?))",
+			like, like, like, like, like, like, like, like, like,
+		)
+	}
+	// SQLite (used by unit tests)
 	return query.Where(
 		"firstname LIKE ? OR lastname LIKE ? OR nickname LIKE ? "+
 			"OR (firstname || ' ' || lastname) LIKE ? OR (nickname || ' ' || lastname) LIKE ? "+
@@ -154,13 +181,13 @@ func GetContacts(c *gin.Context) {
 		}
 	}
 
-	// Apply ordering - random uses RANDOM() function, others use column name
+	// Apply ordering - random uses RAND() function, others use column name
 	// For search with include_archived, order non-archived first
 	if includeArchived && c.Query("search") != "" {
 		query = query.Order("archived ASC")
 	}
 	if sortField == "random" {
-		query = query.Order("RANDOM()")
+		query = query.Order("RAND()")
 	} else {
 		query = query.Order(sortField + " " + sortOrder)
 	}
@@ -175,7 +202,7 @@ func GetContacts(c *gin.Context) {
 	}
 
 	if circle := c.Query("circle"); circle != "" {
-		query = query.Where("EXISTS (SELECT 1 FROM json_each(contacts.circles) WHERE json_each.value = ?)", circle)
+		query = query.Where(circleFilterSQL(db), circle)
 	}
 
 	// Preload requested relationships
@@ -218,7 +245,7 @@ func GetContacts(c *gin.Context) {
 	}
 
 	if circle := c.Query("circle"); circle != "" {
-		countQuery = countQuery.Where("EXISTS (SELECT 1 FROM json_each(contacts.circles) WHERE json_each.value = ?)", circle)
+		countQuery = countQuery.Where(circleFilterSQL(db), circle)
 	}
 
 	countQuery.Count(&total)
@@ -259,7 +286,7 @@ func GetContactsRandom(c *gin.Context) {
 	}
 
 	// Get 5 random contacts
-	query = query.Order("RANDOM()").Limit(5)
+	query = query.Order("RAND()").Limit(5)
 
 	// Execute query
 	if err := query.Find(&contacts).Error; err != nil {
@@ -517,10 +544,18 @@ func GetCircles(c *gin.Context) {
 	}
 	var circleNames []string
 
-	// Raw SQL query to extract unique circle names
-	err := db.Raw(`SELECT DISTINCT json_each.value AS circle
-	               FROM contacts, json_each(contacts.circles)
-	               WHERE contacts.user_id = ?`, userID).Scan(&circleNames).Error
+	// Raw SQL query to extract unique circle names (dialect-specific JSON unnest)
+	var err error
+	if isMySQL(db) {
+		err = db.Raw(`SELECT DISTINCT jt.val AS circle
+		               FROM contacts
+		               JOIN JSON_TABLE(contacts.circles, '$[*]' COLUMNS (val VARCHAR(255) PATH '$')) AS jt
+		               WHERE contacts.user_id = ? AND contacts.circles IS NOT NULL AND json_valid(contacts.circles)`, userID).Scan(&circleNames).Error
+	} else {
+		err = db.Raw(`SELECT DISTINCT json_each.value AS circle
+		               FROM contacts, json_each(contacts.circles)
+		               WHERE contacts.user_id = ?`, userID).Scan(&circleNames).Error
+	}
 	if err != nil {
 		apperrors.AbortWithError(c, apperrors.ErrDatabase("Failed to retrieve circles").WithError(err))
 		return

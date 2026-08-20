@@ -22,7 +22,7 @@ RUN go mod download
 # Copy backend source code
 COPY backend/ .
 
-# Build the application (glebarez/sqlite is pure Go (no CGO, i.e. without QEMU)
+# Build the application (go-sql-driver/mysql is pure Go, no CGO, i.e. without QEMU)
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o meerkat .
 
 # =============================================================================
@@ -55,7 +55,7 @@ RUN if [ -f yarn.lock ]; then yarn build; else npm run build; fi
 FROM alpine:3.20
 
 # Runtime dependencies. shadow provides usermod/groupmod for PUID/PGID remap.
-# No sqlite package needed - the backend uses a pure-Go SQLite driver.
+# No sqlite package needed - the backend connects to an external MySQL server.
 RUN apk add --no-cache \
     ca-certificates \
     tzdata \
@@ -90,7 +90,11 @@ RUN chmod +x /app/entrypoint.sh
 # PORT is the backend's internal bind port - nginx listens on 8080 (below) and
 # proxies to it, so it must not collide with nginx's own port.
 ENV PORT=8081
-ENV SQLITE_DB_PATH=/app/data/meerkat.db
+ENV DB_HOST=127.0.0.1
+ENV DB_PORT=3306
+ENV DB_USER=root
+ENV DB_PASSWORD=123456
+ENV DB_NAME=meerkat
 ENV PROFILE_PHOTO_DIR=/app/static/photos
 ENV GIN_MODE=release
 
